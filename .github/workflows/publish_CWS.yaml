@@ -1,0 +1,20 @@
+name: Publish to CWS on Merge to main
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  deploy:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v4
+      - name: Zip the thing
+        run: 7z a extension.zip manifest.json index.html scripts/* libs/*
+
+      - name: publish to CWS
+        uses: mobilefirstllc/cws-publish@latest
+        with:
+          action: publish
+          zip_file: 'extension.zip'
