@@ -1,10 +1,12 @@
-name: Publish to CWS on Merge to main
+name: Publish to Firefox addon marketplace on Merge to main
 on:
   workflow_dispatch:
   pull_request:
     types: [closed]
     branches: [main, master]
     
+  
+
 jobs:
   deploy:
     if: false
@@ -16,7 +18,10 @@ jobs:
         run: 7z a extension.zip manifest.json index.html scripts/* libs/*
 
       - name: publish to CWS
-        uses: mobilefirstllc/cws-publish@latest
+        uses: wdzeng/firefox-addon@v1
         with:
-          action: publish
-          zip_file: 'extension.zip'
+          addon-guid: miuschedule2ics@danielmichel.developer
+          xpi-path: extension.zip
+          self-hosted: false
+          jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
