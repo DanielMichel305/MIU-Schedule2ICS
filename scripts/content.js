@@ -37,9 +37,30 @@ function renderExportButton(actionsDiv){
 
 }
 
+/**
+ * @returns {number} - Number of weeks to repeat event
+ */
+function getNumberOfWeeks(){
+    const semName = getSemsterName().toLowerCase();
+    if(semName.contains("spring")){
+        return 16
+    }
+    else if(semName.contains("fall")){
+        return 14
+    }
+    return 4
+}
+
+/**
+ * @returns {string}
+ */
+function getSemsterName(){
+    return (document.querySelectorAll(".portlet .caption")[1]).outerText.split(":")[1].replaceAll(' ','_');
+}
+
 
 function getCalanderFileName(){
-    const semName = (document.querySelectorAll(".portlet .caption")[1]).outerText.split(":")[1].replaceAll(' ','_');
+    const semName = getSemsterName()
     const studentID = document.querySelectorAll(".row")[1].outerText.split('/')[1];
     return `${studentID}_Calendar${semName}.ics`;
 }
@@ -127,6 +148,8 @@ function exportScheduleToICS(schedule){
 
     const calender = ics();
     
+    const numberOfOccurrences = getNumberOfWeeks()
+
     for (const day in schedule) {
         if (!Object.hasOwn(schedule, day)) continue;
         
@@ -139,7 +162,7 @@ function exportScheduleToICS(schedule){
 
             const { startTime, endTime} = parseEventTimes(day, lecture.time);
             
-            calender.addEvent(lecture.section, lecture.course, lecture.room, startTime, endTime, {freq: "WEEKLY", count: 2, interval: 1});
+            calender.addEvent(lecture.section, lecture.course, lecture.room, startTime, endTime, {freq: "WEEKLY", count: numberOfOccurrences, interval: 1});
             
             
         }
