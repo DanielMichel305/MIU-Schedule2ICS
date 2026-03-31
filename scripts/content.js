@@ -42,13 +42,23 @@ function renderExportButton(actionsDiv){
  */
 function getNumberOfWeeks(){
     const semName = getSemsterName().toLowerCase();
-    if(semName.contains("spring")){
-        return 16
+    let numberOfWeeks =0;
+    const year = getSemsterName().split('_')[1];
+
+    if(semName.includes("spring")){
+        const endDate = Date.UTC(year, 4,25);
+        numberOfWeeks= (endDate - Date.now()) / ((1000*60*60*24) * 7)
     }
-    else if(semName.contains("fall")){
-        return 14
+    else if(semName.includes("fall")){
+        const endDate = Date.UTC(year, 11, 25);
+        numberOfWeeks=(endDate - Date.now()) / ((1000*60*60*24) * 7)
     }
-    return 4
+    else{
+        const endDate = Date.UTC(year, 7, 6);
+        numberOfWeeks= (endDate - Date.now()) / ((1000*60*60*24) * 7);
+    }
+    
+    return Math.round(numberOfWeeks);
 }
 
 /**
