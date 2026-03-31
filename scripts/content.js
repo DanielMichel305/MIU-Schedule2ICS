@@ -1,3 +1,5 @@
+
+
 const observer = new MutationObserver(() => {
     
     const actionsDiv = document.querySelector(".portlet-title .actions");
@@ -81,17 +83,40 @@ function getICSDayFormat(day){
     return formatDay;
 }
 
-function parseEventTimes(day, timeStr) {
+
+function getSemesterStartDate() {
+    const semName = getSemsterName().toLowerCase();
+    
+    const today = new Date();
+    const year = today.getFullYear();
+
+
+    const semesterStarts = {
+        spring: new Date(year, 0, 30),
+        fall:   new Date(year, 8, 13),
+        summer: new Date(year, 6,5)
+    };
+
+    let semStart = null;
+    if (semName.includes("spring")) semStart = semesterStarts.spring;
+    else if (semName.includes("fall")) semStart = semesterStarts.fall;
+    else semStart = semesterStarts.summer
+
+    return (!semStart || today > semStart) ? today : semStart;
+}
+
+
+function parseEventTimes(day, timeStr, refDate = Date.now()) {
     
     const [startStr, endStr] = timeStr.split("-").map(s => s.trim());
 
     
     const dayMap = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
-    const today = new Date();
+    
     const targetDay = dayMap[day];
-    const diff = (targetDay - today.getDay() + 7) % 7;
-    const eventDate = new Date(today);
-    eventDate.setDate(today.getDate() + diff);
+    const diff = (targetDay - refDate.getDay() + 7) % 7;
+    const eventDate = new Date(refDate);
+    eventDate.setDate(refDate.getDate() + diff);
 
     const toDateStr = (dateObj, timeStr) => {
         const [time, meridiem] = timeStr.split(" ");
@@ -159,6 +184,7 @@ function exportScheduleToICS(schedule){
     const calender = ics();
     
     const numberOfOccurrences = getNumberOfWeeks()
+    const semStart = getSemesterStartDate();
 
     for (const day in schedule) {
         if (!Object.hasOwn(schedule, day)) continue;
@@ -170,7 +196,7 @@ function exportScheduleToICS(schedule){
 
         for (const lecture of lecturesOnDay) {
 
-            const { startTime, endTime} = parseEventTimes(day, lecture.time);
+            const { startTime, endTime} = parseEventTimes(day, lecture.time, semStart);
             
             calender.addEvent(lecture.section, lecture.course, lecture.room, startTime, endTime, {freq: "WEEKLY", count: numberOfOccurrences, interval: 1});
             
