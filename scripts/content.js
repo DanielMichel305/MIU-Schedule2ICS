@@ -2,7 +2,7 @@
 
 const observer = new MutationObserver(() => {
     
-    const actionsDiv = document.querySelector(".portlet-title .actions");
+    const actionsDiv = document.querySelector(".portlet-title .actions") || document.querySelector("#main-content > app-schedule > ion-content > div > div.isweb > ion-card > ion-card-content > ion-grid > ion-row");
     if (actionsDiv && !actionsDiv.querySelector('.export2ics')) {
         observer.disconnect();
         renderExportButton(actionsDiv);
@@ -67,13 +67,15 @@ function getNumberOfWeeks(){
  * @returns {string}
  */
 function getSemsterName(){
-    return (document.querySelectorAll(".portlet .caption")[1]).outerText.split(":")[1].replaceAll(' ','_');
+    const semName =  document.querySelectorAll(".portlet .caption")?.[1]?.outerText?.split(":")?.[1]?.replaceAll(' ','_') || document.querySelector("#main-content > app-schedule > ion-content > div > div.isweb > ion-card > ion-card-content")?.innerText?.trim()?.split(' ')?.slice(0,2)?.join()?.trim()?.replace(',', '_');
+    return semName;
 }
 
 
 function getCalanderFileName(){
     const semName = getSemsterName()
-    const studentID = document.querySelectorAll(".row")[1].outerText.split('/')[1];
+    let studentID = document.querySelector('#main-content > app-schedule > ion-content > div > ion-card > ion-card-content > ion-grid > ion-row:nth-child(1) > ion-col:nth-child(2)')?.innerText ||  document.querySelectorAll(".row")?.[1]?.outerText;
+    studentID = studentID.split('/')[1];
     return `${studentID}_Calendar${semName}.ics`;
 }
 
@@ -138,7 +140,10 @@ function parseEventTimes(day, timeStr, refDate = Date.now()) {
 function parseAndBuildScheduleData(){
 
 
-    const table = document.querySelectorAll(".dataTable_wrapper table")[1];  //[1] because the block is also rendered but hidden so when using querySelector I get the first one of the 2 schecules (block hidden normally and the actual schedule..)
+    const table1 = document.querySelectorAll(".dataTable_wrapper table")?.[1];
+    const table2 = document.querySelector("#main-content > app-schedule > ion-content > div > div.isweb > ion-card > ion-card-content > div > div > table");
+
+    const table = table1 || table2 || null;
     if(!table) return;
 
     const tableHeaders = [...table.querySelectorAll('th')]
@@ -154,22 +159,34 @@ function parseAndBuildScheduleData(){
     const rows = [...table.querySelectorAll("tbody tr")];
     rows.forEach(row => {
         const cells = [...row.querySelectorAll("td")];
+        
         const courseName = cells[0].textContent.trim();
+        
+        
 
         cells.slice(1).forEach((cell, i) => {
             // Only grab visible divs (Angular hides irrelevant ones with ng-hide)
-            const visibleEntries = [...cell.querySelectorAll("div[ng-show]:not(.ng-hide)")];   ///I kinda understand this line's purpose but now sure how we got here (Claude 7beebi)
+            let visibleEntries = [...cell.querySelectorAll("div[ng-show]:not(.ng-hide)")];    ///I kinda understand this line's purpose but now sure how we got here (Claude 7beebi)
+            
+            if(visibleEntries.length === 0) visibleEntries = [...cell.querySelectorAll("p")];
+
 
             visibleEntries.forEach(entry => {
-                const divs = [...entry.querySelectorAll("div")];
-                if (divs.length < 4) return;
+                
 
+                let divs = [...entry.querySelectorAll("div")];
+                if(divs.length === 0 ){
+                    divs = entry.innerText.split('\n')
+                }
+
+                
+                
                 schedule[days[i]].push({
                     course: courseName,
-                    section: divs[0].textContent.trim(),  
-                    time: divs[1].textContent.trim(),      
-                    instructor: divs[2].textContent.trim(),
-                    room: divs[3].textContent.trim()
+                    section: divs[0].textContent?.trim() || divs[0],  
+                    time: divs[1].textContent?.trim() || divs[1],      
+                    instructor: divs[2].textContent?.trim() || divs[2],
+                    room: divs[3].textContent?.trim() || divs[3]
                 });
             });
         });
@@ -181,6 +198,7 @@ function parseAndBuildScheduleData(){
 
 function exportScheduleToICS(schedule){
 
+
     const calender = ics();
     
     const numberOfOccurrences = getNumberOfWeeks()
@@ -189,13 +207,12 @@ function exportScheduleToICS(schedule){
     for (const day in schedule) {
         if (!Object.hasOwn(schedule, day)) continue;
         
-        
+
         const lecturesOnDay = schedule[day];
-        
+
 
 
         for (const lecture of lecturesOnDay) {
-
             const { startTime, endTime} = parseEventTimes(day, lecture.time, semStart);
             
             calender.addEvent(lecture.section, lecture.course, lecture.room, startTime, endTime, {freq: "WEEKLY", count: numberOfOccurrences, interval: 1});
@@ -208,6 +225,8 @@ function exportScheduleToICS(schedule){
 
     const rawICSString = calender.build()
     
+
+
     const icsWithAlarmData = rawICSString.replaceAll(
         /END:VEVENT/g, 
         `BEGIN:VALARM

@@ -18,7 +18,8 @@
         {
             "js" : ["libs/FileSaver.min.js", "libs/ics.min.js","scripts/content.js"],
             "matches" : [
-                "https://portal.miuegypt.edu.eg/*"
+                "https://portal.miuegypt.edu.eg/*",
+                "https://portalpwa.miuegypt.edu.eg/*"
             ],
              "run_at": "document_end"
         }
