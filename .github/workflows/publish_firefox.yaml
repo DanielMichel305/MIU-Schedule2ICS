@@ -19,7 +19,7 @@ jobs:
       - name: Bundle
         run: npm install && npm run build
       - name: Zip the thing
-        run: 7z a extension.zip dist/manifest.json dist/index.html dist/scripts/main.js dist/libs/*
+        run: 7z a extension.zip  ./dist/*
 
 
   deploy:
