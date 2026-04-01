@@ -1,4 +1,4 @@
-name: Publish to Firefox addon marketplace on Merge to main
+name: Publish to Firefox addon marketplace
 on:
   workflow_dispatch:
   # pull_request:
@@ -8,19 +8,27 @@ on:
   
 
 jobs:
-  deploy:
+
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: code checkout
         uses: actions/checkout@v4
+      - name: Bundle
+        run: npm install && npm run dev
       - name: Zip the thing
-        run: 7z a extension.zip manifest.json index.html scripts/* libs/*
+        run: 7z a extension.zip dist/manifest.json dist/index.html dist/scripts/main.js dist/libs/*
 
-      - name: publish to CWS
-        uses: wdzeng/firefox-addon@v1
-        with:
-          addon-guid: miuschedule2ics@danielmichel.developer
-          xpi-path: extension.zip
-          self-hosted: false
-          jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
-          jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+      
+  #     - name: publish to CWS
+  #       uses: wdzeng/firefox-addon@v1
+  #       with:
+  #         addon-guid: miuschedule2ics@danielmichel.developer
+  #         xpi-path: extension.zip
+  #         self-hosted: false
+  #         jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
+  #         jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}

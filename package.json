@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build" : "esbuild scripts/main.js --bundle --outfile=dist/scripts/main.js && cp -t ./dist/ -r ./libs index.html manifest.json"
   },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0-only",
-  "type": "commonjs"
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "^0.27.4"
+  }
 }
