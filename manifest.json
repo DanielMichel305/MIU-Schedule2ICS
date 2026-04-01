@@ -16,9 +16,10 @@
     },
     "content_scripts" : [
         {
-            "js" : ["libs/FileSaver.min.js", "libs/ics.min.js","scripts/content.js"],
+            "js" : ["libs/FileSaver.min.js", "libs/ics.min.js","scripts/main.js"],
             "matches" : [
-                "https://portal.miuegypt.edu.eg/*"
+                "https://portal.miuegypt.edu.eg/*",
+                "https://portalpwa.miuegypt.edu.eg/*"
             ],
              "run_at": "document_end"
         }
