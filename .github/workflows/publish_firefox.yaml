@@ -6,16 +6,17 @@ on:
   #   branches: [main, master]
     
   
+#WAWA KAKA 
 
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-slim
     steps:
       - name: code checkout
         uses: actions/checkout@v4
       - name: Bundle
-        run: npm install && npm run dev
+        run: npm install && npm run build
       - name: Zip the thing
         run: 7z a extension.zip dist/manifest.json dist/index.html dist/scripts/main.js dist/libs/*
 
