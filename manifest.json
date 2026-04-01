@@ -1,7 +1,7 @@
 {
     "name" : "MIU Schedule2ICS",
     "description" : "Extension to export MIU Portal's Schedules to an ICS/Icalander format to Other Calander services (Google Calander, etc..)",
-    "version" : "0.1.2",
+    "version" : "0.1.3",
     "manifest_version" : 3,
     "browser_specific_settings": {
     "gecko": {
