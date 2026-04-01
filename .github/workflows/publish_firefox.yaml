@@ -8,10 +8,11 @@ on:
   
 #WAWA KAKA 
 
-jobs:
 
+jobs:
   build:
-    runs-on: ubuntu-latest-slim
+    runs-on: ubuntu-slim
+  
     steps:
       - name: code checkout
         uses: actions/checkout@v4
